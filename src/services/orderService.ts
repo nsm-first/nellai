@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { OrderItem, ShippingAddress } from '../lib/supabase';
+import { OrderItem, ShippingAddress, handleSupabaseError } from '../lib/supabase';
 
 export interface CreateOrderData {
   customer_name: string;
@@ -49,12 +49,16 @@ class OrderService {
   // Create a new order
   async createOrder(orderData: CreateOrderData): Promise<any> {
     try {
+      console.log('Creating order with data:', orderData);
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error('User not authenticated');
       }
 
+      console.log('Authenticated user:', user.id);
       const orderNumber = this.generateOrderNumber();
+      console.log('Generated order number:', orderNumber);
       
       const { data, error } = await supabase
         .from('orders')
@@ -81,9 +85,10 @@ class OrderService {
 
       if (error) {
         console.error('Error creating order:', error);
-        throw error;
+        handleSupabaseError(error, 'create order');
       }
 
+      console.log('Order created successfully:', data);
       return data;
     } catch (error) {
       console.error('Error in createOrder:', error);
@@ -107,7 +112,7 @@ class OrderService {
 
       if (error) {
         console.error('Error fetching orders:', error);
-        throw error;
+        handleSupabaseError(error, 'fetch user orders');
       }
 
       return data || [];
@@ -134,7 +139,7 @@ class OrderService {
 
       if (error) {
         console.error('Error fetching order:', error);
-        throw error;
+        handleSupabaseError(error, 'fetch order');
       }
 
       return data;
@@ -162,7 +167,7 @@ class OrderService {
 
       if (error) {
         console.error('Error updating order status:', error);
-        throw error;
+        handleSupabaseError(error, 'update order status');
       }
 
       return data;
@@ -204,7 +209,7 @@ class OrderService {
 
       if (error) {
         console.error('Error creating shipping address:', error);
-        throw error;
+        handleSupabaseError(error, 'create shipping address');
       }
 
       return data;
@@ -231,7 +236,7 @@ class OrderService {
 
       if (error) {
         console.error('Error fetching shipping addresses:', error);
-        throw error;
+        handleSupabaseError(error, 'fetch shipping addresses');
       }
 
       return data || [];
@@ -272,7 +277,7 @@ class OrderService {
 
       if (error) {
         console.error('Error updating shipping address:', error);
-        throw error;
+        handleSupabaseError(error, 'update shipping address');
       }
 
       return data;
@@ -298,7 +303,7 @@ class OrderService {
 
       if (error) {
         console.error('Error deleting shipping address:', error);
-        throw error;
+        handleSupabaseError(error, 'delete shipping address');
       }
     } catch (error) {
       console.error('Error in deleteShippingAddress:', error);
@@ -326,7 +331,7 @@ class OrderService {
 
       if (error) {
         console.error('Error setting default address:', error);
-        throw error;
+        handleSupabaseError(error, 'set default address');
       }
     } catch (error) {
       console.error('Error in setDefaultAddress:', error);
@@ -344,13 +349,15 @@ class OrderService {
 
     if (error) {
       console.error('Error clearing default addresses:', error);
-      throw error;
+      handleSupabaseError(error, 'clear default addresses');
     }
   }
 
   // Create payment details
   async createPaymentDetails(paymentData: PaymentDetails): Promise<any> {
     try {
+      console.log('Creating payment details:', paymentData);
+      
       const { data, error } = await supabase
         .from('payment_details')
         .insert([paymentData])
@@ -359,9 +366,10 @@ class OrderService {
 
       if (error) {
         console.error('Error creating payment details:', error);
-        throw error;
+        handleSupabaseError(error, 'create payment details');
       }
 
+      console.log('Payment details created successfully:', data);
       return data;
     } catch (error) {
       console.error('Error in createPaymentDetails:', error);
@@ -381,7 +389,7 @@ class OrderService {
 
       if (error) {
         console.error('Error updating payment details:', error);
-        throw error;
+        handleSupabaseError(error, 'update payment details');
       }
 
       return data;
@@ -402,7 +410,7 @@ class OrderService {
 
       if (error) {
         console.error('Error fetching payment details:', error);
-        throw error;
+        handleSupabaseError(error, 'fetch payment details');
       }
 
       return data;

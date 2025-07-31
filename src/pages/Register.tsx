@@ -19,12 +19,14 @@ const Register: React.FC = () => {
     setSuccess(null);
 
     try {
+      console.log('Attempting to register user:', { email, name });
       await signUp(email, password, name);
       setSuccess('Registration successful! Please check your email to confirm your account before signing in.');
       setTimeout(() => {
         navigate('/login');
       }, 3000);
     } catch (err: any) {
+      console.error('Registration error:', err);
       setError(err.message || 'Registration failed. Please try again.');
     }
 

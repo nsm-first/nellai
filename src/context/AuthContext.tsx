@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, testConnection } from '../lib/supabase';
 import { authService, UserProfile } from '../services/authService';
 import type { User } from '@supabase/supabase-js';
 
@@ -50,6 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const initializeAuth = async () => {
     try {
       console.log('Initializing authentication state...');
+      
+      // Test database connection first
+      const isConnected = await testConnection();
+      if (!isConnected) {
+        console.warn('Database connection test failed, but continuing...');
+      }
       
       // Clear session on app start
       await clearSessionOnStart();
